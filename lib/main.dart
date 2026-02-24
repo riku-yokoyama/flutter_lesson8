@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+// webviewを使用するためのライブラリ
 import 'package:webview_flutter/webview_flutter.dart';
+// レスポンスのJSONをパースするdartのライブラリ
+import 'package:http/http.dart' as http;
+// httpリクエストやレスポンスなどhttpクライアントとしての機能を提供するパッケージ
+// asを使用して名前空間を与えるオプション(ライブラリ内の特定の関数などに短い名前などでアクセスできる)
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -8,7 +14,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
