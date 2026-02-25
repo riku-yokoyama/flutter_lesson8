@@ -43,7 +43,6 @@ class MyHomePage extends StatefulWidget {
  *
  */
 class _MyHomePageState extends State<MyHomePage> {
-
   // Textフィールドからテキストを入力した際のコントローラー
   TextEditingController controller = TextEditingController();
 
@@ -60,12 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // 関数自体はasyncで非同期だが、この部分はhttp.getのレスポンスを待つ = await
     final response = await http.get(
-        Uri.parse('https://zipCloud.ibsnet.co.jp/api/search?zipcode=$zipCode')
-    );
+        Uri.parse('https://zipCloud.ibsnet.co.jp/api/search?zipcode=$zipCode'));
 
     // 以降の処理は、awaitの処理(httpをgetする)まで処理されない
     if (response.statusCode != 200) {
       // 失敗
+      setState(() {
+        errorMessage = '通信に失敗しました。';
+      });
       return;
     }
 
@@ -85,8 +86,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // results.mapはresultsの要素を一つずつ返す拡張forのようなもの
         // (result)はラムダでmapで返ってくるresultsの要素であるresultを引数に取り、
         // =>以下の処理で引数のreusltを使用して処理をするgit
-        items = results.map((
-            result) => "${result['address1']}${result['address2']}${result['address3']}")
+        items = results
+            .map((result) =>
+                "${result['address1']}${result['address2']}${result['address3']}")
             .toList(growable: false);
       });
     }
@@ -95,14 +97,28 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-    title: Text(widget.title),
-    ),
-    body
-    :
-    Center
-    (
-    )
+        title: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              loadZipCode(value);
+            }
+          },
+        ),
+      ),
+      body: ListView.builder(
+        itemBuilder: (context, index) {
+          if (errorMessage.isNotEmpty) {
+            return ListTile(title: Text(errorMessage));
+          } else {
+            return ListTile(title: Text(items[index]));
+          }
+        },
+        itemCount: items.length,
+      ),
+    );
   }
 }
